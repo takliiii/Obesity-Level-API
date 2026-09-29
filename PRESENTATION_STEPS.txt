@@ -1,0 +1,152 @@
+OBESITY LEVELS API
+DOCKER PRESENTATION STEPS
+
+1. START DOCKER DESKTOP
+
+Open Docker Desktop and wait until Docker is running.
+
+2. OPEN THE PROJECT FOLDER
+
+Open this folder in VS Code:
+
+C:\Users\earl\OneDrive\Desktop\Sept1sirDenver\obesity_levels_pred
+
+The project contains:
+
+Dockerfile
+requirements.txt
+app\server.py
+app\dataset\obesity_levels.csv
+app\models\svm_model.pkl
+app\models\scaler.pkl
+app\models\label_encoder.pkl
+
+3. OPEN THE VS CODE TERMINAL
+
+Run:
+
+cd "C:\Users\earl\OneDrive\Desktop\Sept1sirDenver\obesity_levels_pred"
+
+4. BUILD THE DOCKER IMAGE
+
+Run:
+
+docker build -t obesity_levels_pred_img .
+
+Presentation explanation:
+This command reads the Dockerfile, installs the required dependencies, copies the FastAPI application, dataset, and serialized model files, and creates the Docker image named obesity_levels_pred_img.
+
+5. RUN THE DOCKER CONTAINER
+
+Run:
+
+docker rm -f obesity_levels_pred 2>$null
+docker run --name obesity_levels_pred -p 8000:8000 obesity_levels_pred_img
+
+Presentation explanation:
+This starts the container and maps port 8000 from the Docker container to port 8000 on the local computer.
+
+Keep this terminal open while presenting.
+
+6. SHOW DOCKER DESKTOP
+
+Show that the container is running:
+
+Container name: obesity_levels_pred
+Port: 8000:8000
+Status: Running
+
+7. TEST THE ROOT ENDPOINT
+
+Open this address in a browser:
+
+http://localhost:8000
+
+Expected response:
+
+{"message":"Model API"}
+
+Presentation explanation:
+This confirms that the FastAPI service is running successfully inside Docker.
+
+8. OPEN THE FASTAPI SWAGGER DOCUMENTATION
+
+Open:
+
+http://localhost:8000/docs
+
+Presentation explanation:
+FastAPI automatically generates this Swagger interface. It allows us to test the prediction endpoint directly from the browser.
+
+9. TEST THE PREDICT ENDPOINT
+
+In Swagger UI:
+
+1. Expand POST /predict.
+2. Click Try it out.
+3. Enter the following request body.
+4. Click Execute.
+
+Request body:
+
+{
+  "Gender": "Female",
+  "Age": 21,
+  "Height": 1.62,
+  "Weight": 64,
+  "family_history_with_overweight": "yes",
+  "FAVC": "no",
+  "FCVC": 2,
+  "NCP": 3,
+  "CAEC": "Sometimes",
+  "SMOKE": "no",
+  "CH2O": 2,
+  "SCC": "no",
+  "FAF": 0,
+  "TUE": 1,
+  "CALC": "no",
+  "MTRANS": "Public_Transportation"
+}
+
+Expected response format:
+
+{
+  "results": [
+    {
+      "predicted_class": "Normal_Weight",
+      "confidence": 0.88
+    }
+  ]
+}
+
+Presentation explanation:
+The API receives the individual's health and lifestyle information, applies the saved label encoders and scaler, sends the processed data to the saved SVM model, and returns the predicted obesity category with its confidence score.
+
+10. SHOW THE CONTAINER LOGS
+
+Open another terminal and run:
+
+docker logs obesity_levels_pred
+
+The logs show the FastAPI and Uvicorn startup messages and the requests received by the API.
+
+11. STOP THE DEPLOYMENT AFTER PRESENTING
+
+Press Ctrl+C in the running container terminal, or run:
+
+docker stop obesity_levels_pred
+docker rm obesity_levels_pred
+
+IMPORTANT URLS
+
+API root:
+http://localhost:8000
+
+Swagger documentation:
+http://localhost:8000/docs
+
+NOTE
+
+If no files were changed and the container already exists, you can start it without rebuilding:
+
+docker start obesity_levels_pred
